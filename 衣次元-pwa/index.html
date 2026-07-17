@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="color-scheme" content="light">
+  <title>衣次元</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="衣次元">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="衣次元">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#7c3aed">
+  <meta name="msapplication-TileColor" content="#7c3aed">
+  <meta name="msapplication-navbutton-color" content="#7c3aed">
+
+  <!-- PWA Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS Variables & Base ===== */
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #a670db;
+      --primary-dark: #5b21b6;
+      --accent: #f472b6;
+      --accent-light: #fbb6ce;
+      --secondary: #e9d5ff;
+      --secondary-light: #f5f3ff;
+      --bg: #faf9fb;
+      --bg-card: #ffffff;
+      --bg-muted: #f3f1f5;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --border-light: #f0f0f2;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --font: 'Noto Sans SC', -apple-system, sans-serif;
+      --safe-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      height: 100%; 
+      font-family: var(--font); 
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== App Shell ===== */
+    #app {
+      max-width: 448px;
+      margin: 0 auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--bg);
+    }
+
+    .page-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px) saturate(1.5);
+      border-bottom: 1px solid var(--border-light);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      flex: 1;
+    }
+    .page-header .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      font-size: 20px;
+      transition: background 0.2s;
+    }
+    .page-header .back-btn:hover { background: var(--bg-muted); }
+    .page-header .header-action {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 18px;
+    }
+
+    .page-content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .page-content::-webkit-scrollbar { display: none; }
+
+    /* ===== Bottom Tab Bar ===== */
+    .tab-bar {
+      position: sticky;
+      bottom: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px) saturate(1.5);
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      height: 64px;
+      padding-bottom: var(--safe-bottom);
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 8px 16px;
+      transition: all 0.3s;
+      color: var(--text-muted);
+      border: none;
+      background: none;
+      min-width: 60px;
+    }
+    .tab-item.active { color: var(--primary); }
+    .tab-item .tab-icon { font-size: 22px; line-height: 1; }
+    .tab-item .tab-label { font-size: 11px; font-weight: 500; }
+    .tab-item:active { transform: scale(0.95); }
+
+    /* ===== Common Components ===== */
+    .glass-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .glass-card:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font);
+      box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+    }
+    .btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(124,58,237,0.2); }
+
+    .btn-secondary {
+      background: var(--bg-muted);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font);
+    }
+    .btn-secondary:active { transform: scale(0.97); background: var(--border); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--primary);
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .filter-chip.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(166,112,219,0.3);
+    }
+    .filter-chip:active { transform: scale(0.95); }
+
+    .pill-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .pill-tag-primary {
+      background: var(--secondary);
+      color: var(--primary);
+    }
+    .pill-tag-accent {
+      background: rgba(244,114,182,0.15);
+      color: var(--accent);
+    }
+    .pill-tag-muted {
+      background: var(--bg-muted);
+      color: var(--text-secondary);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      color: var(--text-muted);
+    }
+    .empty-state .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state .empty-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .empty-state .empty-desc {
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .page-body { padding: 16px; }
+
+    /* ===== Floating Action Button ===== */
+    .fab {
+      position: fixed;
+      bottom: 90px;
+      right: calc(50% - 200px + 16px);
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 6px 20px rgba(124,58,237,0.35);
+      transition: all 0.3s;
+      z-index: 40;
+    }
+    .fab:active { transform: scale(0.92); }
+
+    /* ===== Clothing Grid ===== */
+    .clothing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 0;
+    }
+    .clothing-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .clothing-card:active { transform: scale(0.97); }
+    .clothing-card .card-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: contain;
+      background: var(--bg-muted);
+      padding: 8px;
+    }
+    .clothing-card .card-info {
+      padding: 8px 10px;
+    }
+    .clothing-card .card-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .clothing-card .card-category {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .clothing-card .card-color-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* ===== Upload Page ===== */
+    .upload-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      text-align: center;
+    }
+    .upload-area .upload-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .upload-area .upload-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .upload-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 280px;
+    }
+    .upload-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font);
+      border: none;
+    }
+    .upload-btn-camera {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+    }
+    .upload-btn-album {
+      background: var(--bg-muted);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .upload-btn:active { transform: scale(0.97); }
+
+    /* ===== Edit Form ===== */
+    .edit-preview {
+      background: linear-gradient(to bottom, rgba(233,213,255,0.3), var(--bg));
+      padding: 24px 16px;
+    }
+    .edit-preview-img {
+      width: 100%;
+      max-width: 200px;
+      aspect-ratio: 1;
+      object-fit: contain;
+      background: var(--bg-muted);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      margin: 0 auto 16px;
+      display: block;
+      padding: 12px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: var(--font);
+      background: var(--bg-card);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+    }
+    .tag-select-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag-option {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+    }
+    .tag-option.selected {
+      background: var(--secondary);
+      color: var(--primary);
+      border-color: var(--primary-light);
+    }
+    .tag-option:active { transform: scale(0.95); }
+
+    .color-select-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .color-option {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .color-option.selected {
+      border-color: var(--primary);
+      transform: scale(1.15);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* ===== DIY Board ===== */
+    .board-canvas {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(135deg, rgba(233,213,255,0.2), var(--bg), rgba(244,114,182,0.05));
+      overflow: hidden;
+      touch-action: none;
+    }
+    .board-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.03) 25%, rgba(0,0,0,0.03) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.03) 75%, rgba(0,0,0,0.03) 76%, transparent 77%),
+        linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.03) 25%, rgba(0,0,0,0.03) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.03) 75%, rgba(0,0,0,0.03) 76%, transparent 77%);
+      background-size: 50px 50px;
+      pointer-events: none;
+    }
+    .board-item {
+      position: absolute;
+      cursor: grab;
+      touch-action: none;
+      transition: box-shadow 0.2s;
+    }
+    .board-item:active { cursor: grabbing; }
+    .board-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: var(--radius-md);
+      background: white;
+      box-shadow: var(--shadow-md);
+      pointer-events: none;
+    }
+    .board-bottom-panel {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-light);
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .board-clothing-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--bg-muted);
+      transition: all 0.2s;
+    }
+    .board-clothing-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+    }
+    .board-clothing-thumb.active-thumb {
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(124,58,237,0.25);
+    }
+
+    /* ===== Calendar ===== */
+    .calendar-month-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 12px 0;
+    }
+    .calendar-month-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .calendar-nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      padding: 8px 12px;
+    }
+    .calendar-weekday {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 4px;
+      font-weight: 500;
+    }
+    .calendar-day {
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      position: relative;
+      transition: all 0.2s;
+      min-height: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .calendar-day:hover { background: var(--bg-muted); }
+    .calendar-day.today {
+      background: var(--secondary);
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .calendar-day.has-outfit::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--primary);
+      position: absolute;
+      bottom: 4px;
+    }
+    .calendar-day.selected {
+      background: var(--primary);
+      color: white;
+    }
+    .calendar-day.selected::after {
+      background: white;
+    }
+
+    /* ===== AI Scene Recommendation ===== */
+    .scene-select {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .scene-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+    }
+    .scene-chip.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(166,112,219,0.3);
+    }
+    .scene-chip:active { transform: scale(0.95); }
+
+    .recommend-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .recommend-card .rc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .recommend-card .rc-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .recommend-card .rc-match {
+      font-size: 13px;
+      color: var(--success);
+      font-weight: 600;
+    }
+    .recommend-card .rc-items {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .recommend-card .rc-item-thumb {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      background: var(--bg-muted);
+      flex-shrink: 0;
+    }
+    .recommend-card .rc-item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+    }
+
+    /* ===== Virtual Fitting ===== */
+    .fitting-body-area {
+      width: 200px;
+      height: 360px;
+      margin: 20px auto;
+      background: linear-gradient(to bottom, rgba(233,213,255,0.3), rgba(244,114,182,0.1));
+      border-radius: var(--radius-xl);
+      border: 2px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .fitting-body-silhouette {
+      width: 120px;
+      height: 280px;
+      opacity: 0.3;
+    }
+    .fitting-clothing-on-body {
+      position: absolute;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    /* ===== Style Report ===== */
+    .report-stat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-muted);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+    }
+    .report-stat .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .report-stat .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .report-stat .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .color-bar {
+      display: flex;
+      height: 24px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .color-bar-segment {
+      transition: width 0.5s ease;
+    }
+
+    .style-radar {
+      width: 200px;
+      height: 200px;
+      margin: 16px auto;
+    }
+
+    /* ===== Save Outfit Page ===== */
+    .save-outfit-preview {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(233,213,255,0.2), var(--bg));
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+    }
+    .save-outfit-item {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+      background: var(--bg-muted);
+    }
+    .save-outfit-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 8px;
+    }
+
+    /* ===== Toast Notification ===== */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      max-width: 300px;
+      text-align: center;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ===== Modal / Overlay ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 150;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      width: 90%;
+      max-width: 360px;
+      transform: scale(0.95);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.show .modal-content {
+      transform: scale(1);
+    }
+
+    /* ===== Animations ===== */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .animate-fade-in { animation: fadeIn 0.3s ease; }
+    .animate-slide-up { animation: slideUp 0.4s ease; }
+
+    /* ===== Responsive (for preview wider than phone) ===== */
+    @media (min-width: 449px) {
+      #app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Page Header -->
+    <div class="page-header" id="pageHeader">
+      <button class="back-btn" id="backBtn" onclick="navigateBack()" style="visibility:hidden">‹</button>
+      <h1 id="pageTitle">衣次元</h1>
+      <button class="header-action" id="headerAction"></button>
+    </div>
+
+    <!-- Page Content -->
+    <div class="page-content" id="pageContent"></div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="tab-bar" id="tabBar">
+      <button class="tab-item active" data-tab="wardrobe" onclick="switchTab('wardrobe')">
+        <span class="tab-icon">👕</span>
+        <span class="tab-label">衣橱</span>
+      </button>
+      <button class="tab-item" data-tab="outfit" onclick="switchTab('outfit')">
+        <span class="tab-icon">🎨</span>
+        <span class="tab-label">搭配</span>
+      </button>
+      <button class="tab-item" data-tab="calendar" onclick="switchTab('calendar')">
+        <span class="tab-icon">📅</span>
+        <span class="tab-label">日历</span>
+      </button>
+      <button class="tab-item" data-tab="ai" onclick="switchTab('ai')">
+        <span class="tab-icon">✨</span>
+        <span class="tab-label">AI</span>
+      </button>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- FAB -->
+    <button class="fab" id="fab" onclick="navigateTo('upload')">+</button>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Data Layer =====
+    const DB = {
+      KEY_CLOTHES: 'yiciyuan_clothes',
+      KEY_OUTFITS: 'yiciyuan_outfits',
+      KEY_CALENDAR: 'yiciyuan_calendar',
+      KEY_PREFERENCES: 'yiciyuan_prefs',
+
+      getClothes() {
+        return JSON.parse(localStorage.getItem(this.KEY_CLOTHES) || '[]');
+      },
+      saveClothes(clothes) {
+        localStorage.setItem(this.KEY_CLOTHES, JSON.stringify(clothes));
+      },
+      addClothing(item) {
+        const clothes = this.getClothes();
+        item.id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        item.createdAt = new Date().toISOString();
+        clothes.push(item);
+        this.saveClothes(clothes);
+        return item;
+      },
+      updateClothing(id, updates) {
+        const clothes = this.getClothes();
+        const idx = clothes.findIndex(c => c.id === id);
+        if (idx >= 0) { Object.assign(clothes[idx], updates); this.saveClothes(clothes); }
+      },
+      deleteClothing(id) {
+        const clothes = this.getClothes().filter(c => c.id !== id);
+        this.saveClothes(clothes);
+      },
+      getClothing(id) {
+        return this.getClothes().find(c => c.id === id);
+      },
+
+      getOutfits() {
+        return JSON.parse(localStorage.getItem(this.KEY_OUTFITS) || '[]');
+      },
+      saveOutfits(outfits) {
+        localStorage.setItem(this.KEY_OUTFITS, JSON.stringify(outfits));
+      },
+      addOutfit(outfit) {
+        const outfits = this.getOutfits();
+        outfit.id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        outfit.createdAt = new Date().toISOString();
+        outfits.push(outfit);
+        this.saveOutfits(outfits);
+        return outfit;
+      },
+
+      getCalendarEntries() {
+        return JSON.parse(localStorage.getItem(this.KEY_CALENDAR) || '{}');
+      },
+      saveCalendarEntry(dateStr, outfitId) {
+        const entries = this.getCalendarEntries();
+        entries[dateStr] = outfitId;
+        localStorage.setItem(this.KEY_CALENDAR, JSON.stringify(entries));
+      },
+
+      getPrefs() {
+        return JSON.parse(localStorage.getItem(this.KEY_PREFERENCES) || '{}');
+      },
+      savePrefs(prefs) {
+        localStorage.setItem(this.KEY_PREFERENCES, JSON.stringify(prefs));
+      }
+    };
+
+    // ===== Navigation =====
+    const CATEGORIES = ['全部', '上装', '下装', '外套', '鞋履', '配饰'];
+    const COLORS = [
+      { name: '黑色', value: '#1a1a1a' },
+      { name: '白色', value: '#ffffff' },
+      { name: '灰色', value: '#9ca3af' },
+      { name: '红色', value: '#ef4444' },
+      { name: '橙色', value: '#f97316' },
+      { name: '黄色', value: '#eab308' },
+      { name: '绿色', value: '#22c55e' },
+      { name: '蓝色', value: '#3b82f6' },
+      { name: '紫色', value: '#8b5cf6' },
+      { name: '粉色', value: '#ec4899' },
+      { name: '棕色', value: '#92400e' },
+      { name: '米色', value: '#d4a574' },
+    ];
+    const STYLES = ['简约', '休闲', '商务', '运动', '复古', '街头', '优雅', '可爱', '前卫', '浪漫'];
+    const SEASONS = ['春季', '夏季', '秋季', '冬季', '四季通用'];
+    const SCENES = ['日常通勤', '商务会议', '休闲约会', '户外运动', '派对聚会', '旅行度假', '面试场合', '居家休闲'];
+
+    let currentPage = 'wardrobe';
+    let currentTab = 'wardrobe';
+    let navHistory = [];
+    let editClothingId = null;
+    let selectedCategory = '全部';
+    let calendarMonth = new Date().getMonth();
+    let calendarYear = new Date().getFullYear();
+    let selectedScene = '日常通勤';
+    let boardItems = [];
+
+    // SVG Icons
+    const ICONS = {
+      shirt: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>`,
+      camera: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`,
+      image: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+      search: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+      delete: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+      heart: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+      sparkle: `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2Z"/></svg>`,
+      calendar: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function showModal(html) {
+      document.getElementById('modalContent').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+    function hideModal() {
+      document.getElementById('modalOverlay').classList.remove('show');
+    }
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) hideModal();
+    });
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-item').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+      const tabMap = { wardrobe: 'wardrobe', outfit: 'outfit_board', calendar: 'calendar', ai: 'ai_scene' };
+      currentPage = tabMap[tab];
+      navHistory = [];
+      renderPage();
+    }
+
+    function navigateTo(page, data) {
+      navHistory.push(currentPage);
+      currentPage = page;
+      if (data) editClothingId = data;
+      renderPage();
+    }
+
+    function navigateBack() {
+      if (navHistory.length > 0) {
+        currentPage = navHistory.pop();
+        editClothingId = null;
+        renderPage();
+      }
+    }
+
+    function renderPage() {
+      const content = document.getElementById('pageContent');
+      const header = document.getElementById('pageHeader');
+      const backBtn = document.getElementById('backBtn');
+      const fab = document.getElementById('fab');
+      const tabBar = document.getElementById('tabBar');
+      const titleEl = document.getElementById('pageTitle');
+      const actionEl = document.getElementById('headerAction');
+
+      const isSubPage = navHistory.length > 0;
+      backBtn.style.visibility = isSubPage ? 'visible' : 'hidden';
+      tabBar.style.display = ['wardrobe', 'outfit_board', 'calendar', 'ai_scene', 'ai_fitting', 'ai_report', 'save_outfit'].includes(currentPage) ? 'flex' : 'none';
+      fab.style.display = currentPage === 'wardrobe' ? 'flex' : 'none';
+
+      const pages = {
+        wardrobe: { title: '衣次元', render: renderWardrobe },
+        upload: { title: '添加衣物', render: renderUpload },
+        edit: { title: '编辑衣物信息', render: renderEdit },
+        outfit_board: { title: 'DIY 搭配', render: renderOutfitBoard },
+        ai_scene: { title: 'AI 智能穿搭推荐', render: renderAIScene },
+        ai_fitting: { title: 'AI 虚拟试穿间', render: renderAIFitting },
+        ai_report: { title: 'AI 智能风格报告', render: renderAIReport },
+        calendar: { title: '穿搭日历', render: renderCalendar },
+        save_outfit: { title: '保存穿搭', render: renderSaveOutfit },
+      };
+
+      const page = pages[currentPage];
+      titleEl.textContent = page ? page.title : '衣次元';
+      actionEl.innerHTML = '';
+      content.innerHTML = page ? page.render() : '';
+      content.scrollTop = 0;
+
+      // Re-attach event handlers after render
+      if (currentPage === 'outfit_board') initBoard();
+      if (currentPage === 'calendar') initCalendar();
+    }
+
+    // ===== Wardrobe Page =====
+    function renderWardrobe() {
+      const clothes = DB.getClothes();
+      const filtered = selectedCategory === '全部' ? clothes : clothes.filter(c => c.category === selectedCategory);
+
+      let html = `<div class="page-body animate-fade-in">`;
+      
+      // Search bar
+      html += `<div style="display:flex;gap:8px;margin-bottom:16px;">
+        <div style="flex:1;display:flex;align-items:center;background:var(--bg-muted);border-radius:var(--radius-md);padding:8px 12px;gap:8px;">
+          ${ICONS.search}
+          <input type="text" placeholder="搜索衣物..." style="border:none;background:none;outline:none;font-size:14px;width:100%;font-family:var(--font);" oninput="filterBySearch(this.value)">
+        </div>
+      </div>`;
+
+      // Category chips
+      html += `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:16px;" class="scrollbar-hide">`;
+      CATEGORIES.forEach(cat => {
+        html += `<button class="filter-chip ${selectedCategory === cat ? 'active' : ''}" onclick="selectCategory('${cat}')">${cat}</button>`;
+      });
+      html += `</div>`;
+
+      // Clothing grid
+      if (filtered.length === 0) {
+        html += `<div class="empty-state">
+          <div class="empty-icon">👕</div>
+          <div class="empty-title">衣橱还是空的</div>
+          <div class="empty-desc">点击右下角的按钮添加你的第一件衣物吧！<br>AI 会自动识别并去除背景</div>
+        </div>`;
+      } else {
+        html += `<div class="clothing-grid">`;
+        filtered.forEach(c => {
+          html += `<div class="clothing-card animate-slide-up" onclick="navigateTo('edit','${c.id}')">
+            <img class="card-img" src="${c.image || generateClothingSVG(c)}" alt="${c.name}">
+            <div class="card-info">
+              <div class="card-name">${c.name || '未命名'}</div>
+              <div class="card-category">
+                <span class="card-color-dot" style="background:${c.colorValue || '#9ca3af'}"></span>
+                ${c.category || '未分类'} · ${c.style || ''}
+              </div>
+            </div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+      return html;
+    }
+
+    function selectCategory(cat) {
+      selectedCategory = cat;
+      renderPage();
+    }
+
+    function filterBySearch(query) {
+      // Re-render with search filter
+      const clothes = DB.getClothes();
+      const q = query.toLowerCase();
+      const filtered = clothes.filter(c => {
+        const matchCat = selectedCategory === '全部' || c.category === selectedCategory;
+        const matchSearch = !q || (c.name && c.name.toLowerCase().includes(q)) || (c.category && c.category.toLowerCase().includes(q));
+        return matchCat && matchSearch;
+      });
+      const grid = document.querySelector('.clothing-grid');
+      if (!grid) return;
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="padding:20px;">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-title">没有找到匹配的衣物</div>
+        </div>`;
+      } else {
+        grid.innerHTML = filtered.map(c => `
+          <div class="clothing-card" onclick="navigateTo('edit','${c.id}')">
+            <img class="card-img" src="${c.image || generateClothingSVG(c)}" alt="${c.name}">
+            <div class="card-info">
+              <div class="card-name">${c.name || '未命名'}</div>
+              <div class="card-category">
+                <span class="card-color-dot" style="background:${c.colorValue || '#9ca3af'}"></span>
+                ${c.category || '未分类'} · ${c.style || ''}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function generateClothingSVG(c) {
+      const categoryIcons = {
+        '上装': `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M30 15 L15 30 L25 35 L25 85 L75 85 L75 35 L85 30 L70 15 Q60 25 50 25 Q40 25 30 15Z" fill="${c.colorValue || '#7c3aed'}" opacity="0.7" stroke="${c.colorValue || '#7c3aed'}" stroke-width="2"/></svg>`,
+        '下装': `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M25 10 L25 50 L15 95 L40 95 L50 55 L60 95 L85 95 L75 50 L75 10Z" fill="${c.colorValue || '#3b82f6'}" opacity="0.7" stroke="${c.colorValue || '#3b82f6'}" stroke-width="2"/></svg>`,
+        '外套': `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M25 10 L10 25 L20 30 L20 90 L40 90 L50 50 L60 90 L80 90 L80 30 L90 25 L75 10 Q62 20 50 20 Q38 20 25 10Z" fill="${c.colorValue || '#5b21b6'}" opacity="0.6" stroke="${c.colorValue || '#5b21b6'}" stroke-width="2"/></svg>`,
+        '鞋履': `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M20 60 L20 75 L10 85 L90 85 L80 75 L80 60 Q60 50 50 55 Q40 50 20 60Z" fill="${c.colorValue || '#92400e'}" opacity="0.7" stroke="${c.colorValue || '#92400e'}" stroke-width="2"/></svg>`,
+        '配饰': `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="30" fill="none" stroke="${c.colorValue || '#ec4899'}" stroke-width="5" opacity="0.7"/><circle cx="50" cy="50" r="15" fill="${c.colorValue || '#ec4899'}" opacity="0.3"/></svg>`,
+      };
+      const icon = categoryIcons[c.category] || categoryIcons['上装'];
+      return `data:image/svg+xml,${encodeURIComponent(icon)}`;
+    }
+
+    // ===== Upload Page =====
+    function renderUpload() {
+      return `<div class="upload-area animate-fade-in">
+        <div style="font-size:64px;margin-bottom:20px;opacity:0.3;">📷</div>
+        <h2 class="upload-title">添加衣物</h2>
+        <p class="upload-desc">拍摄或上传衣物照片，<br>AI 将自动识别并去除背景</p>
+        <div class="upload-btn-group">
+          <button class="upload-btn upload-btn-camera" onclick="handleCapture()">
+            ${ICONS.camera} 拍摄衣物
+          </button>
+          <button class="upload-btn upload-btn-album" onclick="handleUpload()">
+            ${ICONS.image} 从相册选择
+          </button>
+        </div>
+        <div style="margin-top:24px;text-align:center;">
+          <p style="font-size:12px;color:var(--text-muted);">支持 JPG、PNG 格式 · AI 自动去除背景</p>
+        </div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="processFile(event)">`;
+    }
+
+    function handleCapture() {
+      const input = document.getElementById('fileInput');
+      if (input) {
+        input.setAttribute('capture', 'environment');
+        input.click();
+      }
+    }
+
+    function handleUpload() {
+      const input = document.getElementById('fileInput');
+      if (input) {
+        input.removeAttribute('capture');
+        input.click();
+      }
+    }
+
+    function processFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imageData = e.target.result;
+        // Create a new clothing item with the image
+        const item = DB.addClothing({
+          name: '',
+          category: '上装',
+          color: '',
+          colorValue: '#9ca3af',
+          style: '',
+          season: '',
+          image: imageData,
+          tags: []
+        });
+        editClothingId = item.id;
+        navigateTo('edit', item.id);
+        showToast('衣物已添加，请编辑详情');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ===== Edit Page =====
+    function renderEdit() {
+      const item = editClothingId ? DB.getClothing(editClothingId) : null;
+      if (!item) return `<div class="empty-state"><div class="empty-title">衣物不存在</div></div>`;
+
+      return `<div class="animate-fade-in">
+        <!-- Preview -->
+        <div class="edit-preview">
+          <img class="edit-preview-img" src="${item.image || generateClothingSVG(item)}" alt="衣物预览">
+          <div style="text-align:center;">
+            <button class="btn-ghost" onclick="handleChangeImage()" style="font-size:13px;">更换图片</button>
+          </div>
+        </div>
+        
+        <!-- Form -->
+        <div class="page-body" style="padding-bottom:100px;">
+          <div class="form-group">
+            <div class="form-label">衣物名称</div>
+            <input class="form-input" id="editName" value="${item.name || ''}" placeholder="例如：白色圆领T恤">
+          </div>
+          
+          <div class="form-group">
+            <div class="form-label">类别</div>
+            <div class="tag-select-group">
+              ${['上装','下装','外套','鞋履','配饰'].map(cat => 
+                `<button class="tag-option ${item.category === cat ? 'selected' : ''}" onclick="toggleEditCategory('${cat}')">${cat}</button>`
+              ).join('')}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">颜色</div>
+            <div class="color-select-group">
+              ${COLORS.map(c => 
+                `<div class="color-option ${item.colorValue === c.value ? 'selected' : ''}" 
+                  style="background:${c.value};${c.value === '#ffffff' ? 'border:1px solid var(--border);' : ''}" 
+                  onclick="toggleEditColor('${c.name}','${c.value}')"></div>`
+              ).join('')}
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:8px;">当前: ${item.color || '未选择'}</div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">风格</div>
+            <div class="tag-select-group">
+              ${STYLES.map(s => 
+                `<button class="tag-option ${item.style === s ? 'selected' : ''}" onclick="toggleEditStyle('${s}')">${s}</button>`
+              ).join('')}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">适合季节</div>
+            <div class="tag-select-group">
+              ${SEASONS.map(s => 
+                `<button class="tag-option ${item.season === s ? 'selected' : ''}" onclick="toggleEditSeason('${s}')">${s}</button>`
+              ).join('')}
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div style="display:flex;gap:12px;margin-top:24px;">
+            <button class="btn-primary" style="flex:1;" onclick="saveEdit()">保存</button>
+            <button class="btn-secondary" onclick="deleteClothing('${item.id}')" style="color:var(--danger);">${ICONS.delete} 删除</button>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="changeImageInput" accept="image/*" style="display:none" onchange="processChangeImage(event)">`;
+    }
+
+    let editItem = null;
+    function toggleEditCategory(cat) {
+      if (!editClothingId) return;
+      DB.updateClothing(editClothingId, { category: cat });
+      renderPage();
+    }
+    function toggleEditColor(name, value) {
+      if (!editClothingId) return;
+      DB.updateClothing(editClothingId, { color: name, colorValue: value });
+      renderPage();
+    }
+    function toggleEditStyle(style) {
+      if (!editClothingId) return;
+      DB.updateClothing(editClothingId, { style: style });
+      renderPage();
+    }
+    function toggleEditSeason(season) {
+      if (!editClothingId) return;
+      DB.updateClothing(editClothingId, { season: season });
+      renderPage();
+    }
+    function saveEdit() {
+      const name = document.getElementById('editName')?.value || '';
+      if (!editClothingId) return;
+      DB.updateClothing(editClothingId, { name: name });
+      showToast('衣物信息已保存');
+      navigateBack();
+    }
+    function deleteClothing(id) {
+      showModal(`
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">确认删除</h3>
+        <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;">删除后无法恢复，确定要删除这件衣物吗？</p>
+        <div style="display:flex;gap:12px;">
+          <button class="btn-secondary" onclick="hideModal()" style="flex:1;">取消</button>
+          <button class="btn-primary" onclick="confirmDelete('${id}')" style="flex:1;background:linear-gradient(135deg,var(--danger),#f87171);">删除</button>
+        </div>
+      `);
+    }
+    function confirmDelete(id) {
+      DB.deleteClothing(id);
+      hideModal();
+      showToast('衣物已删除');
+      navigateBack();
+    }
+    function handleChangeImage() {
+      document.getElementById('changeImageInput')?.click();
+    }
+    function processChangeImage(event) {
+      const file = event.target.files[0];
+      if (!file || !editClothingId) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        DB.updateClothing(editClothingId, { image: e.target.result });
+        renderPage();
+        showToast('图片已更换');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ===== DIY Outfit Board =====
+    function renderOutfitBoard() {
+      const clothes = DB.getClothes();
+      boardItems = [];
+
+      let html = `<div style="display:flex;flex-direction:column;height:100%;" class="animate-fade-in">`;
+      
+      // Canvas area
+      html += `<div class="board-canvas" id="boardCanvas">
+        <div class="board-grid"></div>
+        <div id="boardItemsContainer"></div>
+        ${clothes.length === 0 ? `
+          <div class="empty-state" style="position:absolute;inset:0;">
+            <div class="empty-icon">🎨</div>
+            <div class="empty-title">开始创建搭配</div>
+            <div class="empty-desc">从下方选择衣物拖拽到画布上<br>自由组合你的穿搭方案</div>
+          </div>
+        ` : ''}
+      </div>`;
+
+      // Bottom panel - clothing items
+      html += `<div class="board-bottom-panel" id="boardPanel">`;
+      html += `<div style="font-size:12px;color:var(--text-muted);margin-right:8px;">衣物:</div>`;
+      html += `<div style="flex:1;display:flex;gap:8px;overflow-x:auto;padding:4px 0;">`;
+      clothes.forEach(c => {
+        html += `<div class="board-clothing-thumb" onclick="addBoardItem('${c.id}')">
+          <img src="${c.image || generateClothingSVG(c)}" alt="${c.name}">
+        </div>`;
+      });
+      html += `</div>`;
+      html += `<button class="btn-primary" style="padding:8px 16px;font-size:13px;" onclick="saveOutfitFromBoard()">保存搭配</button>`;
+      html += `</div>`;
+      html += `</div>`;
+      return html;
+    }
+
+    function addBoardItem(clothingId) {
+      const item = DB.getClothing(clothingId);
+      if (!item) return;
+      const canvas = document.getElementById('boardCanvas');
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = 20 + Math.random() * (rect.width - 120);
+      const y = 20 + Math.random() * (rect.height - 140);
+
+      const boardItem = {
+        id: Date.now().toString(36),
+        clothingId: clothingId,
+        x: x,
+        y: y,
+        width: 100,
+        height: 100
+      };
+      boardItems.push(boardItem);
+
+      const container = document.getElementById('boardItemsContainer');
+      const el = document.createElement('div');
+      el.className = 'board-item';
+      el.id = `board-${boardItem.id}`;
+      el.style.cssText = `left:${x}px;top:${y}px;width:${boardItem.width}px;height:${boardItem.height}px;`;
+      el.innerHTML = `<img src="${item.image || generateClothingSVG(item)}" alt="${item.name}">`;
+      
+      // Make draggable
+      makeDraggable(el, canvas);
+      container.appendChild(el);
+    }
+
+    function makeDraggable(el, container) {
+      let startX, startY, origX, origY;
+      
+      function onStart(e) {
+        e.preventDefault();
+        const touch = e.touches ? e.touches[0] : e;
+        startX = touch.clientX;
+        startY = touch.clientY;
+        origX = parseInt(el.style.left);
+        origY = parseInt(el.style.top);
+        el.style.zIndex = 100;
+        
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+      }
+      
+      function onMove(e) {
+        e.preventDefault();
+        const touch = e.touches ? e.touches[0] : e;
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+        el.style.left = (origX + dx) + 'px';
+        el.style.top = (origY + dy) + 'px';
+      }
+      
+      function onEnd() {
+        el.style.zIndex = 10;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+      }
+      
+      el.addEventListener('mousedown', onStart);
+      el.addEventListener('touchstart', onStart, { passive: false });
+    }
+
+    function initBoard() {}
+
+    function saveOutfitFromBoard() {
+      if (boardItems.length === 0) {
+        showToast('画布上还没有衣物');
+        return;
+      }
+      const clothingIds = boardItems.map(b => b.clothingId);
+      const outfit = DB.addOutfit({
+        name: '搭配 ' + new Date().toLocaleDateString('zh'),
+        clothingIds: clothingIds,
+        scene: '日常'
+      });
+      showToast('搭配已保存！');
+      navigateTo('save_outfit');
+      editClothingId = outfit.id;
+    }
+
+    // ===== Calendar =====
+    function renderCalendar() {
+      const entries = DB.getCalendarEntries();
+      const year = calendarYear;
+      const month = calendarMonth;
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+      const monthNames = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+      const weekdays = ['日','一','二','三','四','五','六'];
+
+      let html = `<div class="page-body animate-fade-in">`;
+      
+      // Month header
+      html += `<div class="calendar-month-header">
+        <button class="calendar-nav-btn" onclick="changeMonth(-1)">‹</button>
+        <h2>${year}年 ${monthNames[month]}</h2>
+        <button class="calendar-nav-btn" onclick="changeMonth(1)">›</button>
+      </div>`;
+
+      // Stats
+      const monthEntries = Object.keys(entries).filter(k => k.startsWith(`${year}-${String(month+1).padStart(2,'0')}`));
+      html += `<div style="display:flex;gap:8px;margin-bottom:16px;">
+        <div style="flex:1;background:var(--secondary-light);border-radius:var(--radius-md);padding:12px;text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:var(--primary);">${monthEntries.length}</div>
+          <div style="font-size:12px;color:var(--text-muted);">本月穿搭</div>
+        </div>
+        <div style="flex:1;background:rgba(244,114,182,0.1);border-radius:var(--radius-md);padding:12px;text-align:center;">
+          <div style="font-size:20px;font-weight:700;color:var(--accent);">${DB.getClothes().length}</div>
+          <div style="font-size:12px;color:var(--text-muted);">衣橱总数</div>
+        </div>
+      </div>`;
+
+      // Calendar grid
+      html += `<div class="glass-card" style="padding:4px;">`;
+      html += `<div class="calendar-grid">`;
+      weekdays.forEach(w => { html += `<div class="calendar-weekday">${w}</div>`; });
+      
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        html += `<div class="calendar-day" style="color:var(--text-muted);"></div>`;
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const isToday = dateStr === todayStr;
+        const hasOutfit = !!entries[dateStr];
+        html += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasOutfit ? 'has-outfit' : ''}" 
+          onclick="selectCalendarDate('${dateStr}')">${d}</div>`;
+      }
+      html += `</div></div>`;
+
+      // Recent outfits
+      if (monthEntries.length > 0) {
+        html += `<div style="margin-top:20px;"><div class="section-title">近期穿搭</div>`;
+        monthEntries.slice(-5).reverse().forEach(dateStr => {
+          const outfitId = entries[dateStr];
+          const outfit = DB.getOutfits().find(o => o.id === outfitId);
+          if (outfit) {
+            html += `<div class="glass-card" style="padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text-muted);width:60px;">${dateStr.slice(5)}</div>
+              <div style="flex:1;display:flex;gap:6px;">
+                ${outfit.clothingIds.map(cid => {
+                  const c = DB.getClothing(cid);
+                  return c ? `<div style="width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--bg-muted);border:1px solid var(--border-light);">
+                    <img src="${c.image || generateClothingSVG(c)}" style="width:100%;height:100%;object-fit:contain;padding:4px;">
+                  </div>` : '';
+                }).join('')}
+              </div>
+            </div>`;
+          }
+        });
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+      return html;
+    }
+
+    function changeMonth(delta) {
+      calendarMonth += delta;
+      if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+      if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+      renderPage();
+    }
+
+    function selectCalendarDate(dateStr) {
+      const clothes = DB.getClothes();
+      if (clothes.length === 0) {
+        showToast('衣橱里还没有衣物，先去添加吧！');
+        return;
+      }
+      showModal(`
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">${dateStr.slice(5)} 的穿搭</h3>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">选择搭配方案记录到日历</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${DB.getOutfits().slice(-5).map(o => `
+            <div style="display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg-muted);border-radius:8px;cursor:pointer;" onclick="assignCalendarOutfit('${dateStr}','${o.id}')">
+              <div style="font-size:14px;font-weight:600;">${o.name}</div>
+            </div>
+          `).join('')}
+          ${DB.getOutfits().length === 0 ? `<p style="text-align:center;color:var(--text-muted);font-size:13px;">还没有保存的搭配方案<br>去 DIY 搭配页创建一个吧！</p>` : ''}
+        </div>
+        <button class="btn-secondary" onclick="hideModal()" style="width:100%;margin-top:12px;">取消</button>
+      `);
+    }
+
+    function assignCalendarOutfit(dateStr, outfitId) {
+      DB.saveCalendarEntry(dateStr, outfitId);
+      hideModal();
+      showToast('穿搭已记录到日历');
+      renderPage();
+    }
+
+    function initCalendar() {}
+
+    // ===== AI Scene Recommendation =====
+    function renderAIScene() {
+      const clothes = DB.getClothes();
+
+      let html = `<div class="page-body animate-fade-in">`;
+      
+      // Scene selection
+      html += `<div class="section-title">选择场景</div>`;
+      html += `<div class="scene-select">`;
+      const sceneIcons = { '日常通勤': '🏢', '商务会议': '💼', '休闲约会': '☕', '户外运动': '🏃', '派对聚会': '🎉', '旅行度假': '🏖️', '面试场合': '📋', '居家休闲': '🏠' };
+      SCENES.forEach(scene => {
+        html += `<button class="scene-chip ${selectedScene === scene ? 'active' : ''}" onclick="selectScene('${scene}')">${sceneIcons[scene] || ''} ${scene}</button>`;
+      });
+      html += `</div>`;
+
+      // AI Recommendations
+      html += `<div class="section-title" style="margin-top:8px;">推荐穿搭方案</div>`;
+
+      if (clothes.length < 2) {
+        html += `<div class="empty-state">
+          <div class="empty-icon">✨</div>
+          <div class="empty-title">衣物不足</div>
+          <div class="empty-desc">需要至少 2 件衣物才能生成搭配推荐<br>快去添加更多衣物吧！</div>
+        </div>`;
+      } else {
+        // Generate mock recommendations based on available clothes
+        const recommendations = generateRecommendations(clothes, selectedScene);
+        html += `<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">找到 ${recommendations.length} 套推荐穿搭方案</div>`;
+        recommendations.forEach(rec => {
+          html += `<div class="recommend-card">
+            <div class="rc-header">
+              <div>
+                <div class="rc-name">${rec.name}</div>
+                <div style="display:flex;gap:4px;margin-top:4px;">
+                  ${rec.tags.map(t => `<span class="pill-tag pill-tag-primary">${t}</span>`).join('')}
+                </div>
+              </div>
+              <div class="rc-match">匹配度 ${rec.matchScore}%</div>
+            </div>
+            <div class="rc-items">
+              ${rec.items.map(c => `
+                <div class="rc-item-thumb">
+                  <img src="${c.image || generateClothingSVG(c)}" alt="${c.name}">
+                </div>
+              `).join('')}
+            </div>
+            <div style="margin-top:12px;font-size:13px;color:var(--text-secondary);line-height:1.5;">${rec.description}</div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <button class="btn-primary" style="padding:8px 16px;font-size:13px;" onclick="applyRecommendation('${rec.id}')">采纳方案</button>
+              <button class="btn-ghost" style="font-size:13px;">查看详情</button>
+            </div>
+          </div>`;
+        });
+      }
+
+      // Quick links to other AI features
+      html += `<div style="margin-top:24px;">
+        <div class="section-title">更多 AI 功能</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="glass-card" style="padding:16px;text-align:center;cursor:pointer;" onclick="navigateTo('ai_fitting')">
+            <div style="font-size:28px;margin-bottom:8px;">👗</div>
+            <div style="font-size:14px;font-weight:600;">虚拟试穿间</div>
+            <div style="font-size:12px;color:var(--text-muted);">AI 模拟试穿效果</div>
+          </div>
+          <div class="glass-card" style="padding:16px;text-align:center;cursor:pointer;" onclick="navigateTo('ai_report')">
+            <div style="font-size:28px;margin-bottom:8px;">📊</div>
+            <div style="font-size:14px;font-weight:600;">风格报告</div>
+            <div style="font-size:12px;color:var(--text-muted);">分析你的穿衣偏好</div>
+          </div>
+        </div>
+      </div>`;
+
+      html += `</div>`;
+      return html;
+    }
+
+    function selectScene(scene) {
+      selectedScene = scene;
+      renderPage();
+    }
+
+    function generateRecommendations(clothes, scene) {
+      // Mock AI recommendation logic
+      const sceneStyles = {
+        '日常通勤': ['简约', '休闲'],
+        '商务会议': ['商务', '优雅'],
+        '休闲约会': ['休闲', '浪漫', '可爱'],
+        '户外运动': ['运动', '休闲'],
+        '派对聚会': ['前卫', '优雅'],
+        '旅行度假': ['休闲', '简约'],
+        '面试场合': ['商务', '简约'],
+        '居家休闲': ['休闲', '可爱']
+      };
+
+      const preferredStyles = sceneStyles[scene] || ['简约'];
+      const matched = clothes.filter(c => preferredStyles.includes(c.style) || !c.style);
+      const others = clothes.filter(c => !preferredStyles.includes(c.style) && c.style);
+
+      const recs = [];
+      const numRecs = Math.min(4, Math.max(2, Math.floor(clothes.length / 2)));
+
+      for (let i = 0; i < numRecs; i++) {
+        const items = [];
+        // Pick top
+        const tops = matched.filter(c => c.category === '上装') || clothes.filter(c => c.category === '上装');
+        if (tops.length > 0) items.push(tops[i % tops.length]);
+        // Pick bottom
+        const bottoms = matched.filter(c => c.category === '下装') || clothes.filter(c => c.category === '下装');
+        if (bottoms.length > 0) items.push(bottoms[i % bottoms.length]);
+        // Optionally add outerwear
+        const outerwear = matched.filter(c => c.category === '外套');
+        if (outerwear.length > 0 && i % 2 === 0) items.push(outerwear[0]);
+
+        // Fallback: pick random items if not enough category matches
+        while (items.length < 2) {
+          const remaining = clothes.filter(c => !items.includes(c));
+          if (remaining.length > 0) items.push(remaining[0]);
+          else break;
+        }
+
+        const matchScore = Math.min(98, 70 + Math.floor(Math.random() * 25));
+        const descriptions = {
+          '日常通勤': '舒适简约的通勤穿搭，让你在办公室也能保持时尚感。',
+          '商务会议': '专业得体的商务搭配，展现你的职场自信。',
+          '休闲约会': '轻松浪漫的约会穿搭，让对方眼前一亮。',
+          '户外运动': '活力十足的运动搭配，兼顾功能与时尚。',
+          '派对聚会': '亮眼前卫的派对造型，成为全场焦点。',
+          '旅行度假': '轻便舒适的旅行穿搭，拍照也好看。',
+          '面试场合': '稳重专业的面试搭配，给面试官留下好印象。',
+          '居家休闲': '舒适自在的居家搭配，放松也不失品味。'
+        };
+
+        recs.push({
+          id: `rec-${i}`,
+          name: `${scene}搭配方案 ${i + 1}`,
+          items: items.filter(Boolean),
+          matchScore: matchScore,
+          tags: [scene, ...preferredStyles.slice(0, 2)],
+          description: descriptions[scene] || '为你精心搭配的穿搭方案。'
+        });
+      }
+
+      return recs;
+    }
+
+    function applyRecommendation(recId) {
+      showToast('搭配方案已采纳并保存！');
+      const outfit = DB.addOutfit({
+        name: `${selectedScene}推荐搭配`,
+        clothingIds: boardItems.map(b => b.clothingId),
+        scene: selectedScene
+      });
+    }
+
+    // ===== AI Virtual Fitting =====
+    function renderAIFitting() {
+      const clothes = DB.getClothes();
+
+      let html = `<div class="page-body animate-fade-in" style="text-align:center;">`;
+      html += `<div style="margin-bottom:16px;">
+        <div class="section-title" style="text-align:left;">AI 虚拟试穿间</div>
+        <p style="font-size:13px;color:var(--text-secondary);text-align:left;">选择衣物，查看虚拟试穿效果</p>
+      </div>`;
+
+      // Body silhouette area
+      html += `<div class="fitting-body-area" id="fittingArea">
+        <svg class="fitting-body-silhouette" viewBox="0 0 120 280" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="60" cy="30" rx="18" ry="22" fill="#ddd" opacity="0.4"/>
+          <rect x="35" y="50" width="50" height="80" rx="8" fill="#ddd" opacity="0.3"/>
+          <rect x="30" y="130" width="20" height="120" rx="6" fill="#ddd" opacity="0.3"/>
+          <rect x="70" y="130" width="20" height="120" rx="6" fill="#ddd" opacity="0.3"/>
+        </svg>
+        <div id="fittingItems"></div>
+      </div>`;
+
+      // Clothing selection
+      html += `<div style="margin-top:16px;">
+        <div class="section-title" style="text-align:left;">选择衣物试穿</div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding:8px 0;">`;
+      
+      clothes.forEach(c => {
+        html += `<div style="width:60px;height:60px;border-radius:12px;border:2px solid var(--border);overflow:hidden;cursor:pointer;background:var(--bg-muted);flex-shrink:0;transition:all 0.2s;" 
+          onclick="addFittingItem('${c.id}')" id="fitting-thumb-${c.id}">
+          <img src="${c.image || generateClothingSVG(c)}" style="width:100%;height:100%;object-fit:contain;padding:4px;">
+        </div>`;
+      });
+
+      if (clothes.length === 0) {
+        html += `<div style="color:var(--text-muted);font-size:13px;padding:20px;">衣橱空空，先去添加衣物吧</div>`;
+      }
+
+      html += `</div></div>`;
+
+      html += `<div style="margin-top:16px;">
+        <button class="btn-primary" onclick="clearFitting()">清空试穿</button>
+      </div>`;
+
+      html += `</div>`;
+      return html;
+    }
+
+    let fittingItems = [];
+    function addFittingItem(clothingId) {
+      const item = DB.getClothing(clothingId);
+      if (!item) return;
+      
+      const fittingArea = document.getElementById('fittingArea');
+      const container = document.getElementById('fittingItems');
+      
+      const posMap = {
+        '上装': { top: 50, left: 25, width: 70, height: 80 },
+        '下装': { top: 130, left: 25, width: 70, height: 80 },
+        '外套': { top: 40, left: 15, width: 90, height: 100 },
+        '鞋履': { top: 230, left: 25, width: 70, height: 40 },
+        '配饰': { top: 20, left: 40, width: 40, height: 40 },
+      };
+      const pos = posMap[item.category] || posMap['上装'];
+      
+      const el = document.createElement('div');
+      el.className = 'fitting-clothing-on-body';
+      el.style.cssText = `top:${pos.top}px;left:${pos.left}px;width:${pos.width}px;height:${pos.height}px;`;
+      el.innerHTML = `<img src="${item.image || generateClothingSVG(item)}" style="width:100%;height:100%;object-fit:contain;opacity:0.85;">`;
+      
+      // Highlight the thumb
+      const thumb = document.getElementById(`fitting-thumb-${clothingId}`);
+      if (thumb) { thumb.style.borderColor = 'var(--primary)'; thumb.style.boxShadow = '0 2px 8px rgba(124,58,237,0.25)'; }
+      
+      makeDraggable(el, fittingArea);
+      container.appendChild(el);
+      fittingItems.push(clothingId);
+    }
+
+    function clearFitting() {
+      const container = document.getElementById('fittingItems');
+      if (container) container.innerHTML = '';
+      fittingItems = [];
+      // Reset all thumb borders
+      document.querySelectorAll('[id^="fitting-thumb-"]').forEach(t => {
+        t.style.borderColor = 'var(--border)';
+        t.style.boxShadow = 'none';
+      });
+    }
+
+    // ===== AI Style Report =====
+    function renderAIReport() {
+      const clothes = DB.getClothes();
+      const outfits = DB.getOutfits();
+      const calendarEntries = DB.getCalendarEntries();
+
+      // Calculate statistics
+      const totalClothes = clothes.length;
+      const totalOutfits = outfits.length;
+      const totalDaysRecorded = Object.keys(calendarEntries).length;
+      
+      const categoryCounts = {};
+      CATEGORIES.slice(1).forEach(c => categoryCounts[c] = 0);
+      clothes.forEach(c => { if (c.category) categoryCounts[c.category] = (categoryCounts[c.category] || 0) + 1; });
+
+      const colorCounts = {};
+      clothes.forEach(c => { if (c.color) colorCounts[c.color] = (colorCounts[c.color] || 0) + 1; });
+
+      const styleCounts = {};
+      clothes.forEach(c => { if (c.style) styleCounts[c.style] = (styleCounts[c.style] || 0) + 1; });
+
+      // Find dominant style
+      const dominantStyle = Object.entries(styleCounts).sort((a,b) => b[1] - a[1])[0];
+      const dominantColor = Object.entries(colorCounts).sort((a,b) => b[1] - a[1])[0];
+
+      let html = `<div class="page-body animate-fade-in">`;
+
+      // Overview stats
+      html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;">
+        <div class="glass-card" style="padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--primary);">${totalClothes}</div>
+          <div style="font-size:12px;color:var(--text-muted);">衣物总数</div>
+        </div>
+        <div class="glass-card" style="padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--accent);">${totalOutfits}</div>
+          <div style="font-size:12px;color:var(--text-muted);">搭配方案</div>
+        </div>
+        <div class="glass-card" style="padding:12px;text-align:center;">
+          <div style="font-size:24px;font-weight:700;color:var(--success);">${totalDaysRecorded}</div>
+          <div style="font-size:12px;color:var(--text-muted);">记录天数</div>
+        </div>
+      </div>`;
+
+      // Style profile
+      html += `<div class="section-title">风格画像</div>`;
+      html += `<div class="glass-card" style="padding:16px;margin-bottom:16px;">`;
+      if (dominantStyle) {
+        html += `<div style="text-align:center;margin-bottom:12px;">
+          <div style="font-size:36px;margin-bottom:4px;">${getStyleEmoji(dominantStyle[0])}</div>
+          <div style="font-size:16px;font-weight:700;">${dominantStyle[0]}风格</div>
+          <div style="font-size:13px;color:var(--text-muted);">你的主要穿衣风格</div>
+        </div>`;
+      } else {
+        html += `<div style="text-align:center;margin-bottom:12px;">
+          <div style="font-size:36px;margin-bottom:4px;">🎨</div>
+          <div style="font-size:16px;font-weight:700;">风格待探索</div>
+          <div style="font-size:13px;color:var(--text-muted);">添加更多衣物来分析你的风格</div>
+        </div>`;
+      }
+
+      // Style distribution bars
+      html += `<div style="margin-top:12px;">`;
+      Object.entries(styleCounts).sort((a,b) => b[1] - a[1]).slice(0, 5).forEach(([style, count]) => {
+        const pct = Math.round(count / totalClothes * 100);
+        html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:12px;width:40px;color:var(--text-secondary);">${style}</span>
+          <div style="flex:1;height:16px;background:var(--bg-muted);border-radius:8px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:8px;transition:width 0.5s;"></div>
+          </div>
+          <span style="font-size:12px;color:var(--text-muted);width:30px;">${pct}%</span>
+        </div>`;
+      });
+      html += `</div></div>`;
+
+      // Color distribution
+      html += `<div class="section-title">颜色偏好</div>`;
+      html += `<div class="glass-card" style="padding:16px;margin-bottom:16px;">`;
+      
+      // Color bar
+      html += `<div class="color-bar">`;
+      const sortedColors = Object.entries(colorCounts).sort((a,b) => b[1] - a[1]);
+      const colorMap = {};
+      COLORS.forEach(c => colorMap[c.name] = c.value);
+      sortedColors.forEach(([name, count]) => {
+        const pct = Math.round(count / totalClothes * 100);
+        html += `<div class="color-bar-segment" style="width:${pct}%;background:${colorMap[name] || '#9ca3af'};"></div>`;
+      });
+      if (sortedColors.length === 0) {
+        html += `<div class="color-bar-segment" style="width:100%;background:var(--bg-muted);"></div>`;
+      }
+      html += `</div>`;
+
+      html += `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">`;
+      sortedColors.slice(0, 6).forEach(([name, count]) => {
+        html += `<span class="pill-tag pill-tag-accent">${name} ${count}件</span>`;
+      });
+      html += `</div></div>`;
+
+      // Category distribution
+      html += `<div class="section-title">衣橱构成</div>`;
+      html += `<div class="glass-card" style="padding:16px;margin-bottom:16px;">`;
+      Object.entries(categoryCounts).sort((a,b) => b[1] - a[1]).forEach(([cat, count]) => {
+        const pct = totalClothes > 0 ? Math.round(count / totalClothes * 100) : 0;
+        html += `<div class="report-stat">
+          <div class="stat-icon" style="background:${getCategoryBg(cat)}">${getCategoryEmoji(cat)}</div>
+          <div style="flex:1;">
+            <div class="stat-value">${count}件</div>
+            <div class="stat-label">${cat} · ${pct}%</div>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+
+      // Suggestions
+      html += `<div class="section-title">AI 建议</div>`;
+      html += `<div class="glass-card" style="padding:16px;">`;
+      const suggestions = generateSuggestions(categoryCounts, styleCounts, colorCounts, totalClothes);
+      suggestions.forEach(s => {
+        html += `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;">
+          <span style="font-size:18px;">${s.icon}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;">${s.title}</div>
+            <div style="font-size:13px;color:var(--text-secondary);line-height:1.4;">${s.desc}</div>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+
+      html += `</div>`;
+      return html;
+    }
+
+    function getStyleEmoji(style) {
+      const map = { '简约': '🤍', '休闲': '🌿', '商务': '💼', '运动': '⚡', '复古': '📻', '街头': '🛹', '优雅': '🌹', '可爱': '🧸', '前卫': '🔮', '浪漫': '🌙' };
+      return map[style] || '🎨';
+    }
+    function getCategoryEmoji(cat) {
+      const map = { '上装': '👕', '下装': '👖', '外套': '🧥', '鞋履': '👟', '配饰': '💍' };
+      return map[cat] || '📦';
+    }
+    function getCategoryBg(cat) {
+      const map = { '上装': 'rgba(124,58,237,0.1)', '下装': 'rgba(59,130,246,0.1)', '外套': 'rgba(91,33,182,0.1)', '鞋履': 'rgba(146,64,14,0.1)', '配饰': 'rgba(236,72,153,0.1)' };
+      return map[cat] || 'var(--bg-muted)';
+    }
+
+    function generateSuggestions(catCounts, styleCounts, colorCounts, total) {
+      const suggestions = [];
+      
+      if (total === 0) {
+        suggestions.push({ icon: '🛍️', title: '开始建设你的衣橱', desc: '先添加一些基础款衣物，AI 才能帮你分析风格偏好。' });
+        return suggestions;
+      }
+
+      // Check balance
+      const topCount = catCounts['上装'] || 0;
+      const bottomCount = catCounts['下装'] || 0;
+      if (topCount > bottomCount * 2) {
+        suggestions.push({ icon: '👖', title: '增加下装搭配', desc: `你有 ${topCount} 件上装但只有 ${bottomCount} 件下装，建议增加裤子和裙子来丰富搭配选择。` });
+      } else if (bottomCount > topCount * 2) {
+        suggestions.push({ icon: '👕', title: '增加上装选择', desc: `下装偏多，建议增加一些上衣来平衡衣橱。` });
+      }
+
+      // Check outerwear
+      if ((catCounts['外套'] || 0) === 0) {
+        suggestions.push({ icon: '🧥', title: '添加一件外套', desc: '外套是提升穿搭层次感的关键，建议添加至少一件百搭外套。' });
+      }
+
+      // Check color diversity
+      const uniqueColors = Object.keys(colorCounts).length;
+      if (uniqueColors < 3) {
+        suggestions.push({ icon: '🎨', title: '丰富颜色选择', desc: '衣橱颜色不够多样，建议增加一些中性色和亮色单品。' });
+      }
+
+      // Check style diversity
+      const uniqueStyles = Object.keys(styleCounts).length;
+      if (uniqueStyles === 1) {
+        suggestions.push({ icon: '🔄', title: '尝试不同风格', desc: '目前所有衣物都是同一风格，尝试探索新风格可以让穿搭更有趣。' });
+      }
+
+      // Check accessories
+      if ((catCounts['配饰'] || 0) === 0) {
+        suggestions.push({ icon: '💍', title: '配饰提升细节', desc: '配饰是穿搭的点睛之笔，一条项链或一顶帽子就能让整体搭配升级。' });
+      }
+
+      if (suggestions.length === 0) {
+        suggestions.push({ icon: '⭐', title: '衣橱状态良好', desc: '你的衣橱构成比较均衡，继续保持！尝试用 DIY 搭配来创造更多组合。' });
+      }
+
+      return suggestions;
+    }
+
+    // ===== Save Outfit Page =====
+    function renderSaveOutfit() {
+      const outfit = editClothingId ? DB.getOutfits().find(o => o.id === editClothingId) : null;
+      const clothes = DB.getClothes();
+
+      let html = `<div class="page-body animate-fade-in">`;
+
+      if (outfit) {
+        const outfitClothes = outfit.clothingIds.map(id => DB.getClothing(id)).filter(Boolean);
+        
+        html += `<div style="text-align:center;margin-bottom:16px;">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">搭配方案</div>
+          <div style="font-size:18px;font-weight:700;">${outfit.name}</div>
+        </div>`;
+
+        // Outfit preview
+        html += `<div class="save-outfit-preview">`;
+        outfitClothes.forEach(c => {
+          html += `<div class="save-outfit-item">
+            <img src="${c.image || generateClothingSVG(c)}" alt="${c.name}">
+          </div>`;
+        });
+        html += `</div>`;
+
+        // Outfit details
+        html += `<div class="section-title">搭配详情</div>`;
+        html += `<div class="glass-card" style="padding:16px;margin-bottom:16px;">`;
+        outfitClothes.forEach(c => {
+          html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+            <div style="width:40px;height:40px;border-radius:8px;overflow:hidden;background:var(--bg-muted);flex-shrink:0;">
+              <img src="${c.image || generateClothingSVG(c)}" style="width:100%;height:100%;object-fit:contain;padding:4px;">
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:600;">${c.name || '未命名'}</div>
+              <div style="font-size:12px;color:var(--text-muted);">${c.category} · ${c.style || '无风格'}</div>
+            </div>
+            <span class="pill-tag pill-tag-primary">${c.color || ''}</span>
+          </div>`;
+        });
+        html += `</div>`;
+
+        // Name input
+        html += `<div class="form-group">
+          <div class="form-label">搭配名称</div>
+          <input class="form-input" id="outfitName" value="${outfit.name}" placeholder="给这个搭配起个名字">
+        </div>`;
+
+        // Scene tag
+        html += `<div class="form-group">
+          <div class="form-label">适合场景</div>
+          <div class="tag-select-group">`;
+        SCENES.forEach(scene => {
+          html += `<button class="tag-option ${outfit.scene === scene ? 'selected' : ''}" onclick="updateOutfitScene('${scene}')">${scene}</button>`;
+        });
+        html += `</div></div>`;
+
+        // Actions
+        html += `<div style="display:flex;gap:12px;margin-top:24px;">
+          <button class="btn-primary" style="flex:1;" onclick="saveOutfitDetails()">保存修改</button>
+          <button class="btn-secondary" onclick="recordOutfitToCalendar()">记入日历</button>
+        </div>`;
+      } else {
+        // Show all saved outfits
+        const allOutfits = DB.getOutfits();
+        html += `<div class="section-title">已保存的搭配</div>`;
+        if (allOutfits.length === 0) {
+          html += `<div class="empty-state">
+            <div class="empty-icon">🎨</div>
+            <div class="empty-title">还没有保存的搭配</div>
+            <div class="empty-desc">去 DIY 搭配页创建你的第一个搭配方案</div>
+          </div>`;
+        } else {
+          allOutfits.forEach(o => {
+            const outfitClothes = o.clothingIds.map(id => DB.getClothing(id)).filter(Boolean);
+            html += `<div class="glass-card" style="padding:16px;margin-bottom:12px;cursor:pointer;" onclick="viewOutfit('${o.id}')">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="font-size:15px;font-weight:600;">${o.name}</div>
+                <span class="pill-tag pill-tag-primary">${o.scene || '日常'}</span>
+              </div>
+              <div style="display:flex;gap:6px;">
+                ${outfitClothes.map(c => `
+                  <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:var(--bg-muted);">
+                    <img src="${c.image || generateClothingSVG(c)}" style="width:100%;height:100%;object-fit:contain;padding:4px;">
+                  </div>
+                `).join('')}
+              </div>
+            </div>`;
+          });
+        }
+      }
+
+      html += `</div>`;
+      return html;
+    }
+
+    function viewOutfit(outfitId) {
+      editClothingId = outfitId;
+      renderPage();
+    }
+
+    function updateOutfitScene(scene) {
+      if (!editClothingId) return;
+      const outfits = DB.getOutfits();
+      const idx = outfits.findIndex(o => o.id === editClothingId);
+      if (idx >= 0) {
+        outfits[idx].scene = scene;
+        DB.saveOutfits(outfits);
+        renderPage();
+      }
+    }
+
+    function saveOutfitDetails() {
+      const name = document.getElementById('outfitName')?.value;
+      if (!editClothingId || !name) return;
+      const outfits = DB.getOutfits();
+      const idx = outfits.findIndex(o => o.id === editClothingId);
+      if (idx >= 0) {
+        outfits[idx].name = name;
+        DB.saveOutfits(outfits);
+        showToast('搭配已保存');
+      }
+    }
+
+    function recordOutfitToCalendar() {
+      if (!editClothingId) return;
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+      DB.saveCalendarEntry(dateStr, editClothingId);
+      showToast('已记入今日日历');
+    }
+
+    // ===== Initial Render =====
+    renderPage();
+
+    // ===== Add demo data if empty =====
+    if (DB.getClothes().length === 0) {
+      const demoItems = [
+        { name: '白色圆领T恤', category: '上装', color: '白色', colorValue: '#ffffff', style: '简约', season: '夏季', tags: [] },
+        { name: '黑色修身牛仔裤', category: '下装', color: '黑色', colorValue: '#1a1a1a', style: '简约', season: '四季通用', tags: [] },
+        { name: '藏蓝色西装外套', category: '外套', color: '蓝色', colorValue: '#3b82f6', style: '商务', season: '秋季', tags: [] },
+        { name: '粉色碎花半裙', category: '下装', color: '粉色', colorValue: '#ec4899', style: '浪漫', season: '夏季', tags: [] },
+        { name: '灰色运动卫衣', category: '上装', color: '灰色', colorValue: '#9ca3af', style: '运动', season: '春季', tags: [] },
+        { name: '白色帆布鞋', category: '鞋履', color: '白色', colorValue: '#ffffff', style: '休闲', season: '四季通用', tags: [] },
+        { name: '紫色针织开衫', category: '外套', color: '紫色', colorValue: '#8b5cf6', style: '优雅', season: '春季', tags: [] },
+        { name: '金色项链', category: '配饰', color: '黄色', colorValue: '#eab308', style: '优雅', season: '四季通用', tags: [] },
+      ];
+      demoItems.forEach(item => DB.addClothing(item));
+      
+      // Also add a demo outfit
+      const clothes = DB.getClothes();
+      DB.addOutfit({
+        name: '简约通勤搭配',
+        clothingIds: [clothes[0].id, clothes[1].id, clothes[5].id],
+        scene: '日常通勤'
+      });
+      DB.addOutfit({
+        name: '约会甜美风',
+        clothingIds: [clothes[0].id, clothes[3].id, clothes[5].id, clothes[7].id],
+        scene: '休闲约会'
+      });
+      
+      renderPage();
+    }
+    // ===== PWA Service Worker Registration =====
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+          console.log('衣次元 Service Worker 已注册', reg.scope);
+        }).catch(err => {
+          console.log('Service Worker 注册失败', err);
+        });
+      });
+    }
+
+    // ===== PWA Install Prompt =====
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // 可以在这里显示自定义的安装按钮
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(result => {
+          if (result.outcome === 'accepted') {
+            showToast('衣次元已安装到你的设备！');
+          }
+          deferredPrompt = null;
+        });
+      }
+    }
+  </script>
+</body>
+</html>
