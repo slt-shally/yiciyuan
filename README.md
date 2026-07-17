@@ -37,3 +37,19 @@ It supports drag-and-drop DIY collocation, 7-day weekly outfit planning, scene-b
 1. Clone repository
 ```bash
 git clone https://github.com/slt-shally/衣次元-pwa.git
+2.Install dependencies
+npm install
+3.Configure backend API address
+4.Local run & package deployment
+npm run dev
+💡 Advantages
+PWA lightweight, accessible via mobile browser without installation
+Full automatic AI digital clothing filing
+Dual matching mode: DIY free collocation + AI scene recommendation
+Full closed-loop service: Manage → Match → Schedule → Try-on → Maintain
+📌 Future Plan
+Fashion outfit community
+Expand fabric maintenance knowledge base
+Connect with smart wardrobe hardware
+📄 License
+MIT License | Open source for learning & communication
