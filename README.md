@@ -41,7 +41,7 @@ It supports drag-and-drop DIY collocation, 7-day weekly outfit planning, scene-b
 
 ## 🚀 Deployment
 1. Clone repository
-git clone https://github.com/slt-shally/衣次元-pwa.git
+git clone [https://github.com/slt-shally/衣次元-pwa.git](https://github.com/slt-shally/yiciyuan)
 2. Install dependencies
 npm install
 3. Configure backend API address
