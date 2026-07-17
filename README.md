@@ -1,32 +1,39 @@
-Yiciyuan-PWA | 衣次元AI穿搭衣橱
-An AI-powered intelligent wardrobe & outfit matching mobile App
-基于 AI 视觉识别的一站式智能衣橱管理 & 场景穿搭推荐手机应用
-📖 Introduction 项目简介
-English
-AI Smart Wardrobe is an all-in-one mobile App for clothing management and outfit matching. With AI vision technology, it automatically matts, identifies and categorizes your clothes to build a digital wardrobe. It supports drag-and-drop DIY collocation, 7-day outfit scheduling, AI scene-based matching, virtual try-on, personal style analysis, clothing inventory tracking and maintenance reminders to simplify daily dressing.
-中文
-AI 智能穿搭衣橱是一站式衣物管理与穿搭推荐手机 App。依托 AI 视觉技术自动对衣物抠图、识别、分类，搭建个人线上衣橱；支持拖拽式 DIY 搭配、七日穿搭规划、AI 场景智能穿搭、虚拟试穿、穿搭风格分析、衣物库存统计与养护提醒，简化每日穿搭决策流程。
-✨ Core Features 核心功能
-AI Intelligent Archiving：Auto matting, garment identification, color & material tagging
-Digital Wardrobe Management：Inventory statistics, storage location recording
-DIY Drag-and-Drop Matching：Combine tops, bottoms, shoes and accessories freely
-7-Day Outfit Planning：Pre-set daily outfits for the whole week
-AI Scene Matching：Generate looks based on weather, occasion and personal identity
-AI Virtual Try-On：Preview wearing effects with uploaded full-body photos
-Style Analysis：Capture your dressing preference to optimize recommendations
-Clothing Care Reminder：Remind cleaning, ironing and maintenance by fabric type
-[保存穿搭.html](https://github.com/user-attachments/files/30113846/default.html)
-[穿搭日历.html](https://github.com/user-attachments/files/30113855/default.html)
-[衣次元.html](https://github.com/user-attachments/files/30113864/default.html)
-[AI 场景搭配生成.html](https://github.com/user-attachments/files/30113873/AI.html)
-[衣物详情编辑.html](https://github.com/user-attachments/files/30113872/default.html)
-[衣物上传页.html](https://github.com/user-attachments/files/30113869/default.html)
-[AI 虚拟试穿间.html](https://github.com/user-attachments/files/30113891/AI.html)
-[AI 智能风格报告.html](https://github.com/user-attachments/files/30113904/AI.html)
-[DIY 搭配操纵板.html](https://github.com/user-attachments/files/30113908/DIY.html)
-🛠 Tech Stack 技术栈
-移动端：Flutter / Android Native /iOS Swift
-前端逻辑：Dart / Java / Swift
-AI Capability：Image matting, object recognition, outfit recommendation algorithm
-Backend：Node.js / Python
-Database：MySQL / Cloud Database
+# Yiciyuan-PWA | 衣次元AI智能衣橱
+> AI-powered wardrobe PWA application for outfit management & matching
+> 基于AI视觉识别的一站式穿搭管理渐进式网页应用
+
+## 📖 Introduction
+### English
+Yiciyuan is an all-in-one PWA for digital wardrobe and intelligent matching. Powered by AI vision, it auto-mats, identifies and classifies uploaded clothes to build your personal digital wardrobe.
+It supports drag-and-drop DIY collocation, 7-day weekly outfit planning, scene-based AI matching, virtual try-on, style analysis, inventory statistics and clothing care reminders to simplify daily dressing decisions.
+
+### 中文
+衣次元是一站式智能衣橱PWA网页应用，依托AI视觉能力自动完成衣物抠图、识别与分类，搭建线上电子衣橱。
+支持拖拽DIY自由搭配、七日穿搭规划、场景化AI穿搭推荐、虚拟试穿、个人风格分析、库存统计与衣物养护提醒，解决穿搭选择、衣物管理的日常痛点。
+
+## ✨ Core Features
+- **AI Auto Archiving**: Auto matting, garment recognition, color & material label
+- **Digital Wardrobe Storage**: Inventory counting, storage location note
+- **DIY Drag Matching**: Free combination of tops, bottoms, shoes & accessories
+- **7-Day Outfit Schedule**: Pre-design weekly daily looks
+- **AI Scene Recommendation**: Generate outfits based on weather, occasion & identity
+- **Virtual Try-On**: Preview fitting effect with your full-body photo
+- **Personal Style Analysis**: Summarize your dressing preference
+- **Clothing Care Alert**: Maintenance & cleaning reminder by fabric type
+
+## 🖼️ Screenshots
+> Replace links with your real preview images
+![Home Page](https://placeholder-img.com/1.png)
+![Matching Panel](https://placeholder-img.com/2.png)
+![AI Recognition Page](https://placeholder-img.com/3.png)
+
+## 🛠 Tech Stack
+- Frontend PWA: HTML / JavaScript / CSS
+- AI Capability: Image matting, garment recognition, outfit recommendation algorithm
+- Backend: Node.js / Python
+- Database: MySQL / Cloud Database
+
+## 🚀 Deployment
+1. Clone repository
+```bash
+git clone https://github.com/slt-shally/衣次元-pwa.git
