@@ -1,4 +1,4 @@
-AI Smart Wardrobe | AI 智能穿搭衣橱 App
+Yiciyuan-PWA | 衣次元AI穿搭衣橱
 An AI-powered intelligent wardrobe & outfit matching mobile App
 基于 AI 视觉识别的一站式智能衣橱管理 & 场景穿搭推荐手机应用
 📖 Introduction 项目简介
