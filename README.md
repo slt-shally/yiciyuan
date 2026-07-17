@@ -1,4 +1,4 @@
-# Yiciyuan-PWA | 衣次元AI智能衣橱
+# Yiciyuan-PWA | 衣次元AI智能衣橱（小demo，完善ing）
 > AI-powered wardrobe PWA application for outfit management & matching
 > 基于AI视觉识别的一站式穿搭管理渐进式应用程序
 
